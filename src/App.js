@@ -1,18 +1,84 @@
-import React, {useState} from 'react';
+import React, {useState, useReducer} from 'react';
 import Progress from './components/Progress';
 import Question from './components/Question';
 import Answers from './components/Answers';
 import './App.css';
 
 
+
+export const SET_CURRENT_ANSWER = 'SET_CURRENT_ANSWER';
+export const SET_CURRENT_QUESTION = 'SET_CURRENT_QUESTION';
+export const SET_ERROR = 'SET_ERROR';
+export const SET_SHOW_RESULTS = 'SET_SHOW_RESULTS';
+export const SET_ANSWERS = 'SET_ANSWERS';
+export const RESET_QUIZ = 'RESET_QUIZ';
+
+
+function quizReducer(state, action) {
+  switch (action.type) {
+      case SET_CURRENT_ANSWER:
+          return {
+              ...state,
+              currentAnswer: action.currentAnswer,
+          };
+      case SET_CURRENT_QUESTION:
+          return {
+              ...state,
+              currentQuestion: action.currentQuestion,
+          };
+      case SET_ERROR:
+          return {
+              ...state,
+              error: action.error,
+          };
+      case SET_SHOW_RESULTS:
+          return {
+              ...state,
+              showResults: action.showResults,
+          };
+      case SET_ANSWERS:
+          return {
+              ...state,
+              answers: action.answers,
+          };
+      case RESET_QUIZ:
+          return {
+              ...state,
+              answers: [],
+              currentQuestion: 0,
+              currentAnswer: '',
+              showResults: false,
+              error: '',
+          };
+      default:
+          return state;
+  }
+}
+
 function App() {
+  const initialState = {
+    currentQuestion: 0,
+    currentAnswer:'',
+    answers:[],
+    showResults: false,
+    error: '',
+  };
+  const [state, dispatch] = useReducer(quizReducer, initialState);
+  const {currentQuestion, currentAnswer, answers, showResults, error} = state;
   
-const [currentQuestion, setCurrentQuestion] = useState(0);
-const [currentAnswer, setCurrentAnswer] = useState("");
-const [answers, setAnswers] = useState([]);
-const [error, setError] = useState(' ');
-const [showResults, setShowResults] = useState(false);
-  const questions = [
+
+
+
+
+// const [currentQuestion, setCurrentQuestion] = useState(0);
+// const [currentAnswer, setCurrentAnswer] = useState("");
+// const [answers, setAnswers] = useState([]);
+// const [error, setError] = useState(' ');
+// const [showResults, setShowResults] = useState(false);
+
+
+
+  const questions = [ 
     {
         id: 1,
         question: 'Which statement about Hooks is not true?',
@@ -46,26 +112,28 @@ const [showResults, setShowResults] = useState(false);
 
 const question = questions[currentQuestion];
 
-const handleClick = e =>{
-  setCurrentAnswer(e.target.value)
-  setError('');
-}
+ 
 
 const next = () => {
   const answer = {questionId: question.id, answer: currentAnswer};
   if (!currentAnswer){
-    setError('Pleases select an option');
+    // setError('Pleases select an option');
+    dispatch({type: SET_ERROR, error: 'Please select an option'})
     return;
   }
   answers.push(answer);
-  setAnswers(answers);
-  setCurrentAnswer('');
+  // setAnswers(answers);
+  dispatch({type: SET_ANSWERS, answers})
+  // setCurrentAnswer('');
+  dispatch({type: SET_CURRENT_ANSWER, currentAnswer: ''})
 
   if (currentQuestion + 1 < questions.length){
-    setCurrentQuestion(currentQuestion + 1);
+    // setCurrentQuestion(currentQuestion + 1);
+    dispatch({type: SET_CURRENT_QUESTION, currentQuestion: currentQuestion + 1})
     return;
   }
-  setShowResults(true)
+  // setShowResults(true)
+  dispatch({type: SET_SHOW_RESULTS, showResults: true})
 }
 const renderError = () =>{
   if(!error){
@@ -91,10 +159,9 @@ const renderResultMark = (question, answer) => {
  };
  
 const restart = () =>{
-  setAnswers([]);
-  setCurrentAnswer('');
-  setCurrentQuestion(0);
-  setShowResults(false);
+ 
+  dispatch({type: RESET_QUIZ});
+  
 }
 
 
@@ -116,12 +183,22 @@ else {
       <Progress total={questions.length} current={currentQuestion + 1} />
       <Question question={question.question} />
     {renderError()}
-    <Answers  question={question} currentAnswer={currentAnswer} handleClick={handleClick}/>
+    {/* // handleClick={handleClick} was changed to dispatch={dispatch} */}
+    <Answers  question={question} 
+    currentAnswer={currentAnswer}
+    //  handleClick={handleClick}
+    dispatch={dispatch}
+     /> 
+     
     <button className='btn btn-primary' onClick={next}>
       Confirm and Continue
     </button>
     </div>
+    
   );
 }
+
 }
 export default App;
+
+//Good practice: set the reducers in a different file...the reducer function and types

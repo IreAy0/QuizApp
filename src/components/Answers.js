@@ -4,20 +4,27 @@ function Answers(props) {
   return (
   <>
     <Answer letter='a' Answer={props.question.answer_a}
-    handleClick={props.handleClick}
+    // dispach={props.handleClick}
+    dispatch={props.dispatch}
     selected={props.currentAnswer === 'a'}/>
     
     <Answer letter='b'  
-    handleClick={props.handleClick} 
+    dispatch={props.dispatch}
+    // handleClick={props.handleClick} 
     Answer={props.question.answer_b} 
     selected={props.currentAnswer === 'b'}/>
 
     <Answer letter='c' 
-    handleClick={props.handleClick} 
+    dispatch={props.dispatch}
+    // handleClick={props.handleClick} 
     Answer={props.question.answer_c} 
     selected={props.currentAnswer === 'c'}/>
 
-    <Answer letter='d' handleClick={props.handleClick} Answer={props.question.answer_d} selected={props.currentAnswer === 'd'}/>
+    <Answer letter='d' 
+    dispatch={props.dispatch}
+    // handleClick={props.handleClick} 
+    Answer={props.question.answer_d} 
+    selected={props.currentAnswer === 'd'}/>
   </>
   );
 }
